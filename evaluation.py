@@ -7,6 +7,8 @@ from sklearn.metrics import mean_squared_error
 
 def RMSE(test_set, cf):
     "*** YOUR CODE HERE ***"
+
+    print(mean_squared_error(cf.benchmark, test_set['Rating']))
     pass
 
 

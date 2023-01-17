@@ -17,7 +17,7 @@ class Recommender:
         self.user_item_matrix = matrix
         # calculate the average of the ranking
         mean_user_rating = np.nanmean(matrix, axis=1).reshape(-1, 1)
-
+        self.benchmark = mean_user_rating
         ratings_diff = (np.array(matrix) - mean_user_rating) + 0.001
         # replace nan -> 0.001
         ratings_diff[np.isnan(ratings_diff)] = 0.001
@@ -58,8 +58,6 @@ class Recommender:
         for i in range(k):
             # find all indexes of the higher rate
             indexes = np.where(predicted_data == predicted_data[idx[i]])
-            # sort those indexes
-            # indexes.tolist()
             list_idx = indexes[0].tolist()
             list_idx.sort()
             for j in list_idx:
