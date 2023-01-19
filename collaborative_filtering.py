@@ -9,6 +9,8 @@ from sklearn.metrics.pairwise import pairwise_distances
 
 class Recommender:
     def __init__(self, strategy='user'):
+        self.benchmark_user = None
+        self.benchmark_product = None
         self.user_item_matrix = None
         self.strategy = strategy
         self.similarity = np.NaN
@@ -17,7 +19,8 @@ class Recommender:
         self.user_item_matrix = matrix
         # calculate the average of the ranking
         mean_user_rating = np.nanmean(matrix, axis=1).reshape(-1, 1)
-        self.benchmark = mean_user_rating
+        self.benchmark_user = mean_user_rating
+        self.benchmark_product = np.nanmean(matrix, axis=0).reshape(-1, 1)
         ratings_diff = (np.array(matrix) - mean_user_rating) + 0.001
         # replace nan -> 0.001
         ratings_diff[np.isnan(ratings_diff)] = 0.001

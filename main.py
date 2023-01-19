@@ -16,16 +16,15 @@ if __name__ == '__main__':
                                           columns='ProductId', values='Rating', aggfunc=np.sum)
     print(user_item_matrix_raw.head())
 
-    # PART 2 - COLLABORATING FILLTERING RECOMMENDATION SYSTEM
+    # PART 2 - COLLABORATING FILTERING RECOMMENDATION SYSTEM
     recommender_user = Recommender().fit(user_item_matrix_raw)
     recommender_item = Recommender('item').fit(user_item_matrix_raw)
 
-    print(recommender_user.recommend_items('AQWF3BBBDL4QJ'))
-    # print(recommender_user.recommend_items('000'))
-    print(recommender_item.recommend_items('A3EO0WA7R3LVBQ'))
-
-    # PART 3 - EVALUATION
-    RMSE(test_set, recommender_user)
-    RMSE(test_set, recommender_item)
+    # print(recommender_user.recommend_items('AQWF3BBBDL4QJ'))
+    # print(recommender_item.recommend_items('A3EO0WA7R3LVBQ'))
+    #
+    # # PART 3 - EVALUATION
+    # RMSE(test_set, recommender_user)
+    # RMSE(test_set, recommender_item)
     precision_at_k(test_set, recommender_user, 20)
     recall_at_k(test_set, recommender_user, 20)
