@@ -1,4 +1,5 @@
 # Eden Cohen 318758778
+
 from data import *
 from collaborative_filtering import *
 # from adi import *
@@ -20,11 +21,11 @@ if __name__ == '__main__':
     recommender_user = Recommender().fit(user_item_matrix_raw)
     recommender_item = Recommender('item').fit(user_item_matrix_raw)
 
-    # print(recommender_user.recommend_items('AQWF3BBBDL4QJ'))
-    # print(recommender_item.recommend_items('A3EO0WA7R3LVBQ'))
-    #
-    # # PART 3 - EVALUATION
-    # RMSE(test_set, recommender_user)
-    # RMSE(test_set, recommender_item)
+    print(recommender_user.recommend_items('AQWF3BBBDL4QJ'))
+    print(recommender_item.recommend_items('A3EO0WA7R3LVBQ'))
+
+    # PART 3 - EVALUATION
+    RMSE(test_set, recommender_user)
+    RMSE(test_set, recommender_item)
     precision_at_k(test_set, recommender_user, 20)
     recall_at_k(test_set, recommender_user, 20)

@@ -60,28 +60,32 @@ def intersection(lst1, lst2):
 def precision_at_k(test_set, cf, k):
     sum_pred = 0
     sum_bench = 0
-
+    none_items = 0
     # get best k products - best average rating
-    top_k_items_bench = cf.benchmark_product.copy()
-    top_k_items_bench = np.sort(top_k_items_bench, axis=0)
-    top_k_items_bench = top_k_items_bench[:k]
-    # top_k_items_bench = [item for sublist in top_k_items_bench for item in sublist]
+    average_rating = cf.user_item_matrix.mean(axis=0)
+    top_k_items_bench = average_rating.sort_values(ascending=False)[:k]
+
     copy_test = test_set.copy()
+    copy_test = copy_test[copy_test['Rating'] >= 3]
 
     for user_id in test_set['UserId'].unique():
         # get k recommended prediction items for user
         recommended_items = cf.recommend_items(user_id, k)
         # get best k rated items from test set
-        top_k_items = copy_test[copy_test['UserId'] == user_id].sort_values(by='Rating', ascending=False)[:k]['ProductId'].to_list()
+        top_k_items_test = copy_test[copy_test['UserId'] == user_id].sort_values(by='Rating', ascending=False)[:k]['ProductId'].to_list()
 
-        len_intersection_pred = len(intersection(recommended_items, top_k_items))
-        len_intersection_bench = len(intersection(recommended_items, top_k_items_bench.index))
+        if len(top_k_items_test) == 0:
+            none_items += 1
+            continue
+
+        len_intersection_pred = len(intersection(recommended_items, top_k_items_test))
+        len_intersection_bench = len(intersection(top_k_items_bench.index, top_k_items_test))
 
         sum_pred += (len_intersection_pred / k)
         sum_bench += (len_intersection_bench / k)
 
-    precision_pred = round(sum_pred / len(test_set['UserId'].unique()), 5)
-    precision_bench = round(sum_bench / len(test_set['UserId'].unique()), 5)
+    precision_pred = round(sum_pred / (len(test_set['UserId'].unique()) - none_items), 5)
+    precision_bench = round(sum_bench / (len(test_set['UserId'].unique()) - none_items), 5)
 
     print(f"precision user based cf: {precision_pred}")
     print(f"precision benchmark: {precision_bench}")
@@ -89,25 +93,38 @@ def precision_at_k(test_set, cf, k):
 
 
 def recall_at_k(test_set, cf, k):
-    sum = 0
+    sum_pred = 0
+    sum_bench = 0
     num_of_none_relevent = 0
+
+    # get best k products - best average rating
+    average_rating = cf.user_item_matrix.mean(axis=0)
+    top_k_items_bench = average_rating.sort_values(ascending=False)[:k]
+
     copy_test = test_set.copy()
+    copy_test = copy_test[copy_test['Rating'] >= 3]
+
     for user_id in test_set['UserId'].unique():
         # get k recommended prediction items for user
-        recommended_items = cf.recommend_items(user_id, k)
+        recommended_items_pred = cf.recommend_items(user_id, k)
+
         # get best k rated items from test set
-        # get all relevant items
         user_ranking = copy_test[copy_test['UserId'] == user_id]
-        user_relevant_ranking = user_ranking[user_ranking['Rating'] >= 3.0]
-        user_relevant_products = user_relevant_ranking['ProductId'].to_list()
-        len_intersection_list = len(intersection(recommended_items, user_relevant_products))
-        if len(user_relevant_products) == 0:
+        top_k_test = user_ranking.sort_values(by='Rating', ascending=False)[:k]['ProductId'].to_list()
+        if len(top_k_test) == 0:
             num_of_none_relevent += 1
             continue
-        sum += (len_intersection_list / len(user_relevant_products))
 
-    precision = round(sum / (len(test_set['UserId'].unique()) - num_of_none_relevent), 5)
-    print(f"recall user based cf: {precision}")
-    return precision
+        len_intersection_list = len(intersection(recommended_items_pred, top_k_test))
+        len_intersection_bench = len(intersection(top_k_items_bench.index, top_k_test))
+
+        sum_pred += (len_intersection_list / len(top_k_test))
+        sum_bench += (len_intersection_bench / len(top_k_test))
+
+    recall_pred = round(sum_pred / (len(test_set['UserId'].unique()) - num_of_none_relevent), 5)
+    recall_bench = round(sum_bench / (len(test_set['UserId'].unique()) - num_of_none_relevent), 5)
+    print(f"recall user based cf: {recall_pred}")
+    print(f"recall benchmark: {recall_bench}")
+    return recall_pred
 
     pass

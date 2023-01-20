@@ -86,7 +86,6 @@ class Recommender:
         idx = np.argsort(-init_predicted_data)
         # print (idx)
         sim_scores = self.get_sim_scores(idx[:k], k, init_predicted_data)
-        # print(sim_scores)
 
         # Return top k movies
         return data.iloc[sim_scores].index.to_list()
