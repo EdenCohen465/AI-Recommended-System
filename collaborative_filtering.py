@@ -23,7 +23,7 @@ class Recommender:
         self.benchmark_product = np.nanmean(matrix, axis=0).reshape(-1, 1)
         ratings_diff = (np.array(matrix) - mean_user_rating) + 0.001
         # replace nan -> 0.001
-        ratings_diff[np.isnan(ratings_diff)] = 0.001
+        ratings_diff[np.isnan(ratings_diff)] = 0
 
         if self.strategy == 'user':
             # User - User based collaborative filtering
